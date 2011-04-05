@@ -4,7 +4,7 @@ header('content-type: text/plain', TRUE, 200);
 echo "hello\n";
 
 try {
-  $db = new PDO('mysql:host=127.0.0.1;port=8889', 'dev', 'dev')
+  $db = new PDO('mysql:host=127.0.0.1;port=8889', 'dev', 'dev');
 } catch (Exception $err) {
   echo 'connect problem';
   throw $err;
@@ -22,3 +22,5 @@ try {
 echo json_encode($results) . "\n";
 
 echo "world!\n";
+
+//var_dump(posix_getrlimit());
