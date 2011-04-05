@@ -7,41 +7,25 @@ http.createServer(function (req, res) {
   res.write('hello\n');
 
   var dbClient = new mysqlClient({
-//    host: '127.0.0.1'
-//    host: 'localhost'
-//    , port: 3306
-    user: 'dev'
+    host: '127.0.0.1'
+    , port: 8889 // crazy MAMP idiosyncrazy
+    , user: 'dev'
     , password: 'dev'
   });
   
   dbClient.connect(function (err) {
-    if (err) {
-      throw err;
-    }
-
-    console.log(util.inspect(dbClient));
-/*
+    if (err) throw err;
     dbClient.query(
-      "SELECT SLEEP(?) AS LEEP, ? AS greeting;"
-      , 
-      [
-        0.666
-        , 'Rise and shine!'
-      ]
-      , 
+      "SELECT SLEEP(?) AS LEEP, ? AS morning_after;",
+      [0.666, 'Rise and shine!'],
       function (err, results, fields) {
-        if (err) {
-          throw err;
-        }
+        if (err) throw err;
 
-        console.log(results);
-        console.log(fields);
+        res.write(util.inspect(results) + '\n');
         
         dbClient.end();
+        res.end('world!\n');
       }
     );
-*/
   });
-
-  res.end('world!\n');
 }).listen(8567);
