@@ -14,12 +14,12 @@ http.createServer(function (req, res) {
   });
   
   dbClient.connect(function (err) {
-    if (err) throw err;
+    if (err) { console.log('connect problem'); throw err; }
     dbClient.query(
       "SELECT SLEEP(?) AS LEEP, ? AS morning_after;",
       [0.666, 'Rise and shine!'],
       function (err, results, fields) {
-        if (err) throw err;
+        if (err) { console.log('read problem'); throw err; }
 
         res.write(util.inspect(results) + '\n');
         
