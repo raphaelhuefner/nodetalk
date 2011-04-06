@@ -107,10 +107,10 @@
 
       var paper = Raphael(50, 50, 800, 2000);
 
-      var linechartLoadAvg = [];
-      var textLoadAvg = [];
-      var textLoadAvgLabel = [];
-      var textLoadAvgLabelRect = [];
+      var linechartLoadAvg = {};
+      var textLoadAvg = {};
+      var textLoadAvgLabel = {};
+      var textLoadAvgLabelRect = {};
 
       function redraw(prefix, leaves, graphIndex) {
         var graphYOffset = 200 * graphIndex;
@@ -125,18 +125,18 @@
         y.push([0]); // fixate y axis
         x.push([0]); // fixate y axis
         y.push([1]); // fixate y axis
-        linechartLoadAvg[graphIndex] && linechartLoadAvg[graphIndex].remove();
-        linechartLoadAvg[graphIndex] = paper.g.linechart(30, graphYOffset+10, 720, 150, x, y, {shade: true, axis: "0 1 1 1", symbol: "o", width:1, colors: colors});
-        textLoadAvgLabelRect[graphIndex] && textLoadAvgLabelRect[graphIndex].remove();
-        textLoadAvgLabelRect[graphIndex] = paper.rect(60, graphYOffset+2, 120, (20*(leaves.length+2)), 10);
-        textLoadAvgLabelRect[graphIndex].attr({"fill": '#ccc', "stroke": '1px solid #666', opacity:0.75});
-        textLoadAvg[graphIndex] && textLoadAvg[graphIndex].remove();
-        textLoadAvg[graphIndex] = paper.text(120, graphYOffset+20, prefix).attr({font:"12px 'Fontin Sans', Fontin-Sans, sans-serif"});
+        linechartLoadAvg[prefix] && linechartLoadAvg[prefix].remove();
+        linechartLoadAvg[prefix] = paper.g.linechart(30, graphYOffset+10, 720, 150, x, y, {shade: true, axis: "0 1 1 1", symbol: "o", width:1, colors: colors});
+        textLoadAvgLabelRect[prefix] && textLoadAvgLabelRect[prefix].remove();
+        textLoadAvgLabelRect[prefix] = paper.rect(60, graphYOffset+2, 120, (20*(leaves.length+2)), 10);
+        textLoadAvgLabelRect[prefix].attr({"fill": '#ccc', "stroke": '1px solid #666', opacity:0.75});
+        textLoadAvg[prefix] && textLoadAvg[prefix].remove();
+        textLoadAvg[prefix] = paper.text(120, graphYOffset+20, prefix).attr({font:"12px 'Fontin Sans', Fontin-Sans, sans-serif"});
         for (l = 0, ll = leaves.length; l < ll; l++) {
-          textLoadAvgLabel[graphIndex] && textLoadAvgLabel[graphIndex][l] && textLoadAvgLabel[graphIndex][l].remove();
-          textLoadAvgLabel[graphIndex] = textLoadAvgLabel[graphIndex] || [];
-          textLoadAvgLabel[graphIndex][l] = paper.text(120, graphYOffset + 40 + (20*l), leaves[l]).attr({font:"12px 'Fontin Sans', Fontin-Sans, sans-serif"});
-          textLoadAvgLabel[graphIndex][l].attr("fill", colors[l]);
+          textLoadAvgLabel[prefix] && textLoadAvgLabel[prefix][l] && textLoadAvgLabel[prefix][l].remove();
+          textLoadAvgLabel[prefix] = textLoadAvgLabel[prefix] || [];
+          textLoadAvgLabel[prefix][l] = paper.text(120, graphYOffset + 40 + (20*l), leaves[l]).attr({font:"12px 'Fontin Sans', Fontin-Sans, sans-serif"});
+          textLoadAvgLabel[prefix][l].attr("fill", colors[l]);
         }
       }
 
