@@ -1,27 +1,52 @@
 <!doctype html>
 <html>
   <head>
-    <title>socket.io client test</title>
+    <title>stat display</title>
         
     <script src="/json.js"></script> <!-- for ie -->
     <script src="/socket.io/socket.io.js"></script>
+    <script src="/underscore.js"></script>
+    <script src="/raphael/raphael.js"></script>
+    <script src="/g.raphael/g.raphael.js"></script>
+    <script src="/g.raphael/g.line.js"></script>
+    <script src="/g.raphael/g.line.js"></script>
   </head>
   <body>
     
     <script>
+      var timeWindow = 30000;
+      var basket = {}, previousBasket = {};
+
+      window.setInterval(function exchangeBaskets() {
+        var oldPreviousBasket = previousBasket;
+        previousBasket = basket;
+        basket = {};
+        window.setTimeout(function () {
+          delete oldPreviousBasket;
+        }, 1000);
+      }, timeWindow*2);
+
       function esc(msg){
         return msg.replace(/</g, '&lt;').replace(/>/g, '&gt;');
       };
       
       function mylog (obj) {
-        if( window.console && console.log ) console.log(obj);
+        if (window.console && console.log) console.log(obj);
       }
       
       var socket = new io.Socket(null, {port: parseInt(window.location.port) || 80, rememberTransport: false});
       socket.connect();
 
-      socket.on('message', function(obj){
-        mylog(obj);
+      socket.on('message', function(msg){
+        if ('queue' in msg) {
+          for (var i = 0, ii = msg.queue.length; i < ii; i++) {
+            var event = msg.queue[i];
+            var prefixSubBasket = basket[event.prefix] = basket[event.prefix] || [];
+            var insertPos = _.sortedIndex(prefixSubBasket, event, function (event) {return event.time;});
+            delete event.prefix;
+            prefixSubBasket.splice(insertPos, 0, event);
+          }
+        }
       });
       
       socket.on('connect', function(){ mylog('Websocket: Connected'); });
@@ -29,19 +54,59 @@
       socket.on('reconnect', function(){ mylog('Websocket: Reconnected to server'); });
       socket.on('reconnecting', function( nextRetry ){ mylog('Websocket: Attempting to re-connect to the server, next attempt in ' + nextRetry + 'ms'); });
       socket.on('reconnect_failed', function(){ mylog('Websocket: Reconnected to server FAILED.'); });
+
+      var paper = Raphael(50, 50, 800, 200);
+      paper.g.txtattr.font = "12px 'Fontin Sans', Fontin-Sans, sans-serif";
+
+      function scrapeBasket(basket, prefix, leaf, horizon, lineData) {
+        if (basket[prefix]) {
+          var prefixSubBasket = basket[prefix];
+          for (var i = 0, ii = prefixSubBasket.length; i < ii; i++) {
+            if (prefixSubBasket[i].leaves[leaf] && (horizon < prefixSubBasket[i].time)) {
+              lineData.x.push(prefixSubBasket[i].time - horizon);
+              lineData.y.push(prefixSubBasket[i].leaves[leaf]);
+            }
+          }
+        }
+        return lineData;
+      }
+
+      function getLineData(prefix, leaf) {
+        var now = Date.now(), lineData = {x:[], y:[]};
+        var horizon = now - timeWindow;
+        lineData.x.push(0); // avoid x-axis-jitter
+        lineData.y.push(0); // avoid x-axis-jitter
+        lineData = scrapeBasket(previousBasket, prefix, leaf, horizon, lineData);
+        lineData = scrapeBasket(basket, prefix, leaf, horizon, lineData);
+        lineData.x.push(timeWindow); // avoid x-axis-jitter
+        lineData.y.push(0); // avoid x-axis-jitter
+        lineData.y[0] = lineData.y[1];
+        if (lineData.y[lineData.y.length-2]) {
+          lineData.y[lineData.y.length-1] = lineData.y[lineData.y.length-2];
+        }
+        return lineData;
+      }
+
+      var linechartLoadAvg = null;
+      var textLoadAvg = null;
+
+
+      window.setInterval(function redraw() {
+        var lineData = getLineData('systemLoad', '1min');
+        linechartLoadAvg && linechartLoadAvg.remove();
+        linechartLoadAvg = paper.g.linechart(30, 10, 720, 150, [lineData.x, [0], [0]], [lineData.y, [0], [3]], {shade: true, axis: "0 0 1 1"});
+        textLoadAvg && textLoadAvg.remove();
+        textLoadAvg = paper.text(120, 20, "Load Average").attr({font:"12px 'Fontin Sans', Fontin-Sans, sans-serif", color:'#f99'});
+//        Raphael.fn.g.colors
+      }, 500);
+
+
     </script>
     
-    <h1>Sample chat client</h1>
-    <div id="chat"><p>Connecting...</p></div>
+    <h1>stat display with socket.io</h1>
     <style>
-      #chat { height: 300px; overflow: auto; width: 800px; border: 1px solid #eee; font: 13px Helvetica, Arial; }
-      #chat p { padding: 8px; margin: 0; }
-      #chat p:nth-child(odd) { background: #F6F6F6; }
-      #form { width: 782px; background: #333; padding: 5px 10px; display: none; }
-      #form input[type=text] { width: 700px; padding: 5px; background: #fff; border: 1px solid #fff; }
-      #form input[type=submit] { cursor: pointer; background: #999; border: none; padding: 6px 8px; -moz-border-radius: 8px; -webkit-border-radius: 8px; margin-left: 5px; text-shadow: 0 1px 0 #fff; }
-      #form input[type=submit]:hover { background: #A2A2A2; }
-      #form input[type=submit]:active { position: relative; top: 2px; }
+      * { margin:0; padding:0; }
+      body { height: 100%; width: 100%; font: 13px Helvetica, Arial; background: #FFF; position: relative;}
     </style>
     
   </body>

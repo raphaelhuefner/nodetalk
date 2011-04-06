@@ -1,5 +1,8 @@
 #!/bin/bash
 
+git clone https://github.com/DmitryBaranovskiy/raphael.git public/raphael
+git clone https://github.com/DmitryBaranovskiy/g.raphael.git public/g.raphael
+
 sudo rm set-linux-ulimit
 gcc set-linux-ulimit.c -o set-linux-ulimit
 chmod o-rwx set-linux-ulimit
@@ -18,6 +21,7 @@ cd -
 
 git clone https://github.com/senchalabs/connect.git
 git clone https://github.com/visionmedia/express.git
+git clone https://github.com/documentcloud/underscore.git
 
 git clone https://github.com/felixge/node-mysql.git mysql
 cd mysql

@@ -68,5 +68,9 @@ server.on('connection', function connectionHandler (connectionStream) {
   });
 });
 
+process.on('uncaughtException', function (err) {
+  console.log('Caught exception: ' + err);
+});
+
 server.listen(8567, '127.0.0.1');
 console.log('HTTP server listens on http://127.0.0.1:8567/.');

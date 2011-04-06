@@ -1,5 +1,10 @@
 var express = require('express')
+  , _ = require('./node_modules/underscore')._
   , util = require('util')
+  , os = require('os')
+  , mysqlClient = require('mysql').Client
+  , exec = require('child_process').exec
+  , spawn = require('child_process').spawn
   , io = require('./node_modules/socket.io');
 
 var app = express.createServer();
@@ -18,27 +23,116 @@ app.listen(3000);
 // socket.io 
 var websocket = io.listen(app, {flashPolicyServer:false}); 
 
-var buffer = ['hi there'];
-
 websocket.on('connection', function (client) { 
-  client.send({ buffer: buffer });
   client.on('message', function () { console.log('websocket client message') }) 
   client.on('disconnect', function () { console.log('websocket client disconnect') }) 
 }); 
-/*
-websocket.on('connection', function (client) {
-  client.send({ buffer: buffer });
-  client.broadcast({ announcement: client.sessionId + ' connected' });
-  
-  client.on('message', function(message){
-    var msg = { message: [client.sessionId, message] };
-    buffer.push(msg);
-    if (buffer.length > 15) buffer.shift();
-    client.broadcast(msg);
-  });
 
-  client.on('disconnect', function(){
-    client.broadcast({ announcement: client.sessionId + ' disconnected' });
+var queue = [];
+function enQueueData(prefix, leaves) {
+  queue.push({
+    prefix: prefix
+    , time: Date.now()
+    , leaves: leaves
   });
+}
+
+function sendDataPackage() {
+  if (0 < queue.length) {
+    websocket.broadcast({queue:queue});
+    queue = [];
+//    console.log('send ' + Date.now());
+  }
+}
+
+setInterval(sendDataPackage, 50);
+
+function netstat() {
+  var valid = true;
+  var output = {};
+//  var netstatChildProcess = spawn('netstat', ['--inet', '-an']); // Linux
+  var netstatChildProcess = spawn('netstat', ['-f', 'inet', '-an']); // Mac OSX
+  netstatChildProcess.stdin.end();
+  netstatChildProcess.stderr.on('data', function(data) {
+//    console.log('stderr: ' + data);
+    valid = false;
+  });
+  netstatChildProcess.stdout.setEncoding('utf8');
+
+  netstatChildProcess.stdout.on('data', function (data) {
+    var lines = data.split(/\n/);
+    for (i = 0; i < lines.length; i++) {
+      var fields = lines[i].trim().split(/\s+/);
+
+      // gawk '$4 == "127.0.0.1:8567" && $6 != "LISTEN" {sum[$6]++}; END {for (i in sum) print i, sum[i]}'
+      if (fields[5] && fields[3] && (/127\.0\.0\.1.8567/.test(fields[3]))) {
+        output[fields[5]] = output[fields[5]] ? output[fields[5]]++ : 1;
+      }
+    }
+  })
+
+  netstatChildProcess.on('exit', function (code) {
+//    console.log('child process exited with code ' + code);
+//    console.log(util.inspect(output));
+    if (! _.isEmpty(output)) {
+      enQueueData('netstat', output);
+    }
+    setTimeout(netstat, 200);
+  });
+}
+
+
+function systemLoad() {
+  var avg = os.loadavg();
+  enQueueData('systemLoad', {
+    '1min' : avg[0]
+    , '5min' : avg[1]
+    , '15min' : avg[2]
+  });
+  setTimeout(systemLoad, 1000);
+}
+
+var dbClient = new mysqlClient({
+  host: '127.0.0.1'
+//  , port: 3306 // try 8889 with MAMP
+  , port: 8889
+  , user: 'dev'
+  , password: 'dev'
 });
-*/
+
+process.on('exit', function () {
+  dbClient.end();
+});
+
+dbClient.connect(function dbConnectHandler (err) {
+  if (err) {
+    console.log('DB connect error: (' + err.number + ') ' + err.message);
+    process.exit(1);
+  }
+});
+
+function mySqlProcessCount() {
+
+  dbClient.query(
+    "SHOW PROCESSLIST;",
+    function dbResultHandler (err, results, fields) {
+      if (err) {
+        console.log('DB read error: (' + err.number + ') ' + err.message);
+      }
+      else {
+        enQueueData('mySqlProcessCount', {
+          'processes' : results.length
+        });
+        setTimeout(mySqlProcessCount, 100);
+      }
+    }
+  );
+
+}
+
+
+
+
+netstat();
+systemLoad();
+mySqlProcessCount();
