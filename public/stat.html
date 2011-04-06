@@ -60,8 +60,6 @@
       socket.on('reconnecting', function( nextRetry ){ mylog('Websocket: Attempting to re-connect to the server, next attempt in ' + nextRetry + 'ms'); });
       socket.on('reconnect_failed', function(){ mylog('Websocket: Reconnected to server FAILED.'); });
 
-      var paper = Raphael(50, 50, 800, 200);
-
       function scrapeBasket(basket, prefix, leaf, horizon, lineData) {
         if (basket[prefix]) {
           var prefixSubBasket = basket[prefix];
@@ -80,34 +78,36 @@
         var horizon = (now + servertimeOffset) - timeWindow;
 
         var dataLines = {};
+        var lineData = null;
         for (l in leaves) {
-          var lineData = {x:[], y:[]};
+          lineData = {x:[], y:[]};
           lineData.x.push(0); // avoid x-axis-jitter
           lineData.y.push(0); // avoid x-axis-jitter
-          lineData = scrapeBasket(previousBasket, prefix, leaf, horizon, lineData);
-          lineData = scrapeBasket(basket, prefix, leaf, horizon, lineData);
+          lineData = scrapeBasket(previousBasket, prefix, leaves[l], horizon, lineData);
+          lineData = scrapeBasket(basket, prefix, leaves[l], horizon, lineData);
           lineData.x.push(timeWindow); // avoid x-axis-jitter
           lineData.y.push(0); // avoid x-axis-jitter
           lineData.y[0] = lineData.y[1];
           if (lineData.y[lineData.y.length-2]) {
             lineData.y[lineData.y.length-1] = lineData.y[lineData.y.length-2];
           }
-          dataLines{leaves[l]} = lineData;
+          dataLines[leaves[l]] = lineData;
         }
         return dataLines;
       }
 
-      var linechartLoadAvg = null;
-      var textLoadAvg = null;
-      var textLoadAvgLabel = [];
+      var paper = Raphael(50, 50, 800, 1000);
 
-      window.setInterval(function redraw() {
-        var leaves = ['1min', '5min', '15min'];
-        var dataLines = getDataLines('systemLoad', leaves);
-        linechartLoadAvg && linechartLoadAvg.remove();
-        var x = [], y = [], colors = [], labels = [];
-        for (l = 0, ll = leaves.length; l < ll; l++) {
-          labels.push(leaves[l]);
+      var linechartLoadAvg = [];
+      var textLoadAvg = [];
+      var textLoadAvgLabel = [];
+      var textLoadAvgLabelRect = [];
+
+      function redraw(prefix, leaves, graphIndex) {
+        var graphYOffset = 200 * graphIndex;
+        var dataLines = getDataLines(prefix, leaves);
+        var x = [], y = [], colors = [];
+        for (var l = 0, ll = leaves.length; l < ll; l++) {
           x.push(dataLines[leaves[l]].x);
           y.push(dataLines[leaves[l]].y);
           colors.push(Raphael.fn.g.colors[l]);
@@ -116,16 +116,23 @@
         y.push([0]); // fixate y axis
         x.push([0]); // fixate y axis
         y.push([1]); // fixate y axis
-        linechartLoadAvg = paper.g.linechart(30, 10, 720, 150, x, y, {shade: true, axis: "0 1 1 1", colors: colors});
-        textLoadAvg && textLoadAvg.remove();
-        textLoadAvg = paper.text(120, 20, "Load Average").attr({font:"12px 'Fontin Sans', Fontin-Sans, sans-serif"});
-        textLoadAvg.attr("fill", "#f99");
-        for (l = 0, ll = labels.length; l < ll; l++) {
-          textLoadAvgLabel[l] && textLoadAvgLabel[l].remove();
-          textLoadAvgLabel[l] = paper.text(120, 40 + (20*l), labels[l]).attr({font:"12px 'Fontin Sans', Fontin-Sans, sans-serif", color:'#f99'});
-          textLoadAvgLabel[l].attr("fill", colors[l]);
+        linechartLoadAvg[graphIndex] && linechartLoadAvg[graphIndex].remove();
+        linechartLoadAvg[graphIndex] = paper.g.linechart(30, graphYOffset+10, 720, 150, x, y, {shade: true, axis: "0 1 1 1", colors: colors});
+        textLoadAvgLabelRect[graphIndex] && textLoadAvgLabelRect[graphIndex].remove();
+        textLoadAvgLabelRect[graphIndex] = paper.rect(60, graphYOffset+2, 120, (20*(leaves.length+2)), 10);
+        textLoadAvgLabelRect[graphIndex].attr({"fill": '#ccc', "stroke": '1px solid #666', opacity:0.75});
+        textLoadAvg[graphIndex] && textLoadAvg[graphIndex].remove();
+        textLoadAvg[graphIndex] = paper.text(120, graphYOffset+20, prefix).attr({font:"12px 'Fontin Sans', Fontin-Sans, sans-serif"});
+        for (l = 0, ll = leaves.length; l < ll; l++) {
+          textLoadAvgLabel[graphIndex] && textLoadAvgLabel[graphIndex][l] && textLoadAvgLabel[graphIndex][l].remove();
+          textLoadAvgLabel[graphIndex] = textLoadAvgLabel[graphIndex] || [];
+          textLoadAvgLabel[graphIndex][l] = paper.text(120, graphYOffset + 40 + (20*l), leaves[l]).attr({font:"12px 'Fontin Sans', Fontin-Sans, sans-serif"});
+          textLoadAvgLabel[graphIndex][l].attr("fill", colors[l]);
         }
-      }, 500);
+      }
+
+      window.setInterval(function () {redraw('systemLoad', ['1min', '5min', '15min'], 0);}, 500);
+      window.setInterval(function () {redraw('mySqlProcessCount', ['processes'], 1);}, 500);
 
 
     </script>
