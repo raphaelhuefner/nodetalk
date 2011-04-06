@@ -16,14 +16,19 @@
     <script>
       var timeWindow = 30000;
       var basket = {}, previousBasket = {};
+      var hierarchy = {}, previousHierarchy = {};
       var servertimeOffset = 0;
 
       window.setInterval(function exchangeBaskets() {
         var oldPreviousBasket = previousBasket;
+        var oldPreviousHierarchy = previousHierarchy;
         previousBasket = basket;
         basket = {};
+        previousHierarchy = hierarchy;
+        hierarchy = {};
         window.setTimeout(function () {
           delete oldPreviousBasket;
+          delete oldPreviousHierarchy;
         }, 1000);
       }, timeWindow*2);
 
@@ -42,6 +47,10 @@
         if ('queue' in msg) {
           for (var i = 0, ii = msg.queue.length; i < ii; i++) {
             var event = msg.queue[i];
+            hierarchy[event.prefix] = hierarchy[event.prefix] || {};
+            for (l in event.leaves) {
+              hierarchy[event.prefix][l] = hierarchy[event.prefix][l] || l;
+            }
             var prefixSubBasket = basket[event.prefix] = basket[event.prefix] || [];
             var insertPos = _.sortedIndex(prefixSubBasket, event, function (event) {return event.time;});
             delete event.prefix;
@@ -96,7 +105,7 @@
         return dataLines;
       }
 
-      var paper = Raphael(50, 50, 800, 1000);
+      var paper = Raphael(50, 50, 800, 2000);
 
       var linechartLoadAvg = [];
       var textLoadAvg = [];
@@ -132,7 +141,33 @@
       }
 
       window.setInterval(function () {redraw('systemLoad', ['1min', '5min', '15min'], 0);}, 500);
-      window.setInterval(function () {redraw('mySqlProcessCount', ['processes'], 1);}, 500);
+      window.setInterval(function () {
+        var currentHierarchy = {};
+        for (prefix in hierarchy) {
+          currentHierarchy[prefix] = currentHierarchy[prefix] || {};
+          for (leaf in hierarchy[prefix]) {
+            currentHierarchy[prefix][leaf] = currentHierarchy[prefix][leaf] || [leaf];
+          }
+        }
+        
+        for (prefix in previousHierarchy) {
+          currentHierarchy[prefix] = currentHierarchy[prefix] || {};
+          for (leaf in previousHierarchy[prefix]) {
+            currentHierarchy[prefix][leaf] = currentHierarchy[prefix][leaf] || [leaf];
+          }
+        }
+
+        var graphIndex = 0;
+        for (prefix in currentHierarchy) {
+          redraw(prefix, _.toArray(currentHierarchy[prefix]), graphIndex);
+          graphIndex++;
+        }
+/*
+        redraw('mySqlProcessCount', ['processes'], 1);
+        console.log(hierarchy);
+        console.log(previousHierarchy);
+        */
+      }, 500);
 
 
     </script>
