@@ -26,8 +26,8 @@ var server = http.createServer(function (req, res) {
 
     dbClient.connect(function (err) {
       if (err) {
-        console.log('connect error');
-        console.log(util.inspect(err));
+        console.log('connect error: (' + err.number + ') ' + err.message);
+//        console.log(util.inspect(err));
       }
 
       dbClient.query(
