@@ -236,7 +236,8 @@ function mySqlProcessCount() {
 
 netstat('node-netstat', /127\.0\.0\.1.8567/);
 netstat('apache-netstat', /127\.0\.0\.1.8004/);
-proclist('proc', /apache2|node|mysqlphp-cgi|nginx/);
+//proclist('proc', /apache2|node|mysql|php-cgi|nginx/);
+proclist('proc', /apache2|node|mysql/);
 
 systemLoad();
 mySqlProcessCount();
