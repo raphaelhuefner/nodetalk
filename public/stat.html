@@ -161,8 +161,15 @@
           }
         }
 
-        var graphIndex = 0;
+        var prefixes = [];
         for (prefix in currentHierarchy) {
+          prefixes.push(prefix);
+        }
+        prefixes.sort();
+        
+        var graphIndex = 0;
+        for (p = 0, pp = prefixes.length; p < pp; p++) {
+          var prefix = prefixes[p];
           redraw(prefix, _.toArray(currentHierarchy[prefix]), graphIndex);
           graphIndex++;
         }
