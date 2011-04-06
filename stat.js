@@ -90,12 +90,12 @@ function netstat(prefix, localPortRegExp) {
 }
 
 function parse_size(size) {
-  var suffixes = [
+  var suffixes = {
     '1': 1
     , 'k': 1024
     , 'm': 1048576 // 1024 * 1024
     , 'g': 1073741824 // 1024 * 1024 * 1024
-  ];
+  };
   var result = /([0-9]+)\s*(k|m|g)?(b?(ytes?)?)/i.exec(size);
   if (null !== result) {
     var suffix = result[2].toLowerCase();
