@@ -28,27 +28,29 @@ var server = http.createServer(function (req, res) {
       if (err) {
         console.log('DB connect error: (' + err.number + ') ' + err.message);
 //        console.log(util.inspect(err));
+        res.end('error!\n');
       }
-
-      dbClient.query(
-        "SELECT SLEEP(?) AS LEEP, ? AS morning_after;",
-        [0.666, 'Rise and shine!'],
-        function (err, results, fields) {
-          if (err) {
-            console.log('DB read error: (' + err.number + ') ' + err.message);
-//            console.log(util.inspect(err));
+      else {
+        dbClient.query(
+          "SELECT SLEEP(?) AS LEEP, ? AS morning_after;",
+          [0.666, 'Rise and shine!'],
+          function (err, results, fields) {
+            if (err) {
+              console.log('DB read error: (' + err.number + ') ' + err.message);
+//              console.log(util.inspect(err));
+            }
+            else {
+              res.write(util.inspect(results) + '\n');
+            }
+            dbClient.end();
+            res.end('world!\n');
           }
-  
-          res.write(util.inspect(results) + '\n');
-          
-          dbClient.end();
-          res.end('world!\n');
-        }
-      );
-
+        );
+      }
     });
   } catch (err) {
     console.log('DB connect catched error: (' + err.errno + ') ' + err.message);
+    res.end('error!\n');
   }
 
 });
