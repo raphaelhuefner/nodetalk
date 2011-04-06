@@ -15,7 +15,6 @@ var server = http.createServer(function (req, res) {
 
   res.writeHead(200, {'content-type': 'text/plain'});
   res.write('hello\n');
-        res.end('world!\n');
 
   try {
     var dbClient = new mysqlClient({
@@ -26,12 +25,19 @@ var server = http.createServer(function (req, res) {
     });
 
     dbClient.connect(function (err) {
-      if (err) { console.log('connect problem'); throw err; }
+      if (err) {
+        console.log('connect error');
+        console.log(util.inspect(err));
+      }
+
       dbClient.query(
         "SELECT SLEEP(?) AS LEEP, ? AS morning_after;",
         [0.666, 'Rise and shine!'],
         function (err, results, fields) {
-          if (err) { console.log('read problem'); throw err; }
+          if (err) {
+            console.log('read error');
+            console.log(util.inspect(err));
+          }
   
           res.write(util.inspect(results) + '\n');
           
@@ -39,6 +45,7 @@ var server = http.createServer(function (req, res) {
           res.end('world!\n');
         }
       );
+
     });
     
   } catch (err) {

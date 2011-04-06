@@ -1,5 +1,18 @@
 # Try to get node running with a concurrency of at least 1000 connections
 
+## Linux (Ubuntu 9.10 "karmic koala")
+
+### Raise limits
+
+Edit file /etc/security/limits.conf
+
+    sudo vim /etc/security/limits.conf
+
+Add or modify the following lines (replace stuff in <angle brackets>):
+
+    <username>       soft    nofile          200000
+    <username>       hard    nofile          200000
+
 ## MacOS X
 
 ### Raise system limits
@@ -58,4 +71,3 @@ add or modify the following settings to read as this:
     bind_address=127.0.0.1
 
 Restart MySQL to take these new settings into account.
-
