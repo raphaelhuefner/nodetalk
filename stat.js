@@ -50,8 +50,8 @@ setInterval(sendDataPackage, 50);
 function netstat() {
   var valid = true;
   var output = {};
-//  var netstatChildProcess = spawn('netstat', ['--inet', '-an']); // Linux
-  var netstatChildProcess = spawn('netstat', ['-f', 'inet', '-an']); // Mac OSX
+  var netstatChildProcess = spawn('netstat', ['--inet', '-an']); // Linux
+//  var netstatChildProcess = spawn('netstat', ['-f', 'inet', '-an']); // Mac OSX
   netstatChildProcess.stdin.end();
   netstatChildProcess.stderr.on('data', function(data) {
 //    console.log('stderr: ' + data);
@@ -94,8 +94,8 @@ function systemLoad() {
 
 var dbClient = new mysqlClient({
   host: '127.0.0.1'
-//  , port: 3306 // try 8889 with MAMP
-  , port: 8889
+  , port: 3306 // try 8889 with MAMP
+//  , port: 8889
   , user: 'dev'
   , password: 'dev'
 });
