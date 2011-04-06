@@ -1,4 +1,4 @@
-# Try to get node running with a cocurrency of at least 1000 connections
+# Try to get node running with a concurrency of at least 1000 connections
 
 ## MacOS X
 
@@ -51,8 +51,9 @@ Under the section
 
     [mysqld]
 
-add or modify the "max_connections" and "bind_address" setting to read as this:
+add or modify the following settings to read as this:
 
+    port=3306
     max_connections=1001
     bind_address=127.0.0.1
 
