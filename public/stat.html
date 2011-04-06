@@ -50,7 +50,7 @@
         }
         if ('servertime' in msg) {
           servertimeOffset = msg.servertime - Date.now();
-          console.log(servertimeOffset);
+//          console.log(servertimeOffset);
         }
       });
       
@@ -98,7 +98,7 @@
       window.setInterval(function redraw() {
         var lineData = getLineData('systemLoad', '1min');
         linechartLoadAvg && linechartLoadAvg.remove();
-        linechartLoadAvg = paper.g.linechart(30, 10, 720, 150, [lineData.x, [0], [0]], [lineData.y, [0], [3]], {shade: true, axis: "0 0 1 1"});
+        linechartLoadAvg = paper.g.linechart(30, 10, 720, 150, [lineData.x, [0], [0]], [lineData.y, [0], [3]], {shade: true, axis: "0 1 1 1"});
         textLoadAvg && textLoadAvg.remove();
         textLoadAvg = paper.text(120, 20, "Load Average").attr({font:"12px 'Fontin Sans', Fontin-Sans, sans-serif", color:'#f99'});
 //        Raphael.fn.g.colors
