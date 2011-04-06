@@ -23,7 +23,12 @@ var server = http.createServer(function (req, res) {
       , user: 'dev'
       , password: 'dev'
     });
+  } catch (err) {
+    console.log('catched error around mysqlClient instantiation');
+    console.log(util.inspect(err));
+  }
 
+  try {
     dbClient.connect(function (err) {
       if (err) {
         console.log('DB connect error: (' + err.number + ') ' + err.message);
@@ -47,9 +52,8 @@ var server = http.createServer(function (req, res) {
       );
 
     });
-    
   } catch (err) {
-    console.log('catched error around mysqlClient instantiation and DB connect');
+    console.log('catched error around DB connect');
     console.log(util.inspect(err));
   }
 })
