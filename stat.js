@@ -99,7 +99,7 @@ function parse_size(size) {
   var result = /([0-9]+)\s*(k|m|g)?(b?(ytes?)?)/i.exec(size);
   if (null !== result) {
     var suffix = result[2].toLowerCase();
-    if ('' == suffix {
+    if ('' == suffix) {
       suffix = '1';
     }
     return parseFloat(result[1]) * suffixes[suffix];
