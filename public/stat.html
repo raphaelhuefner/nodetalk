@@ -59,7 +59,6 @@
         }
         if ('servertime' in msg) {
           servertimeOffset = msg.servertime - Date.now();
-//          console.log(servertimeOffset);
         }
       });
       
@@ -140,7 +139,6 @@
         }
       }
 
-      window.setInterval(function () {redraw('systemLoad', ['1min', '5min', '15min'], 0);}, 500);
       window.setInterval(function () {
         var currentHierarchy = {};
         for (prefix in hierarchy) {
@@ -162,11 +160,6 @@
           redraw(prefix, _.toArray(currentHierarchy[prefix]), graphIndex);
           graphIndex++;
         }
-/*
-        redraw('mySqlProcessCount', ['processes'], 1);
-        console.log(hierarchy);
-        console.log(previousHierarchy);
-        */
       }, 500);
 
 
