@@ -39,7 +39,7 @@ function enQueueData(prefix, leaves) {
 
 function sendDataPackage() {
   if (0 < queue.length) {
-    websocket.broadcast({queue:queue});
+    websocket.broadcast({queue:queue, servertime:Date.now()});
     queue = [];
 //    console.log('send ' + Date.now());
   }
