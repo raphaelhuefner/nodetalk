@@ -16,17 +16,12 @@ var server = http.createServer(function (req, res) {
   res.writeHead(200, {'content-type': 'text/plain'});
   res.write('hello\n');
 
-  try {
-    var dbClient = new mysqlClient({
-      host: '127.0.0.1'
-      , port: 3306 // try 8889 with MAMP
-      , user: 'dev'
-      , password: 'dev'
-    });
-  } catch (err) {
-    console.log('catched error around mysqlClient instantiation');
-    console.log(util.inspect(err));
-  }
+  var dbClient = new mysqlClient({
+    host: '127.0.0.1'
+    , port: 3306 // try 8889 with MAMP
+    , user: 'dev'
+    , password: 'dev'
+  });
 
   try {
     dbClient.connect(function (err) {
@@ -53,10 +48,10 @@ var server = http.createServer(function (req, res) {
 
     });
   } catch (err) {
-    console.log('catched error around DB connect');
-    console.log(util.inspect(err));
+    console.log('DB connect catched error: (' + err.errno + ') ' + err.message);
   }
-})
+
+});
 
 server.listen(8567);
 console.log('HTTP server listens on port 8567.');

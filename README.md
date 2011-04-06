@@ -2,7 +2,7 @@
 
 ## Linux (Ubuntu 9.10 "karmic koala")
 
-### Raise limits
+### Raise limits, part I
 
 Edit file /etc/security/limits.conf
 
@@ -12,6 +12,46 @@ Add or modify the following lines (replace stuff in <angle brackets>):
 
     <username>       soft    nofile          200000
     <username>       hard    nofile          200000
+
+My box seems not to take this into account at all. Maybe this would have a
+meaning when I would directly ssh into the box as <username>.
+
+### Raise limits, part II
+
+Edit file /etc/rc.local
+
+    sudo vim /etc/rc.local
+
+Add or modify the following lines:
+
+    ulimit -Hn 1000000
+    ulimit -Sn 1000000
+
+Maybe this helps Apache and MySQL?
+
+### Raise limits, part III
+
+Since I ssh into my Linux box as root (boo!), do this as well:
+Edit file /root/.bashrc
+
+    sudo vim /root/.bashrc
+
+Add or modify the following lines:
+
+    ulimit -Hn 1000000
+    ulimit -Sn 1000000
+
+### Raise MySQL connection limit
+
+    vim /etc/mysql/my.cnf
+
+Add or modify the following lines:
+
+    max_connections = 5001
+
+Restart MySQL
+
+    /etc/init.d/mysql restart
 
 ## MacOS X
 
