@@ -7,6 +7,7 @@ var server = http.createServer(function requestHandler (req, res) {
 //  console.log(util.inspect(req));
 
   req.socket.setNoDelay(true);
+  req.socket.setKeepAlive(true);
 
   req.socket.on('error', function socketErrorHandler (err) {
     console.log('socket error: (' + err.errno + ') ' + err.message);
@@ -67,5 +68,5 @@ server.on('connection', function connectionHandler (connectionStream) {
   });
 });
 
-server.listen(8567);
-console.log('HTTP server listens on port 8567.');
+server.listen(8567, '127.0.0.1');
+console.log('HTTP server listens on http://127.0.0.1:8567/.');

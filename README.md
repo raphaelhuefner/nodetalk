@@ -9,13 +9,13 @@ Edit file /etc/security/limits.conf
     sudo vim /etc/security/limits.conf
 
 Add or modify the following lines
-(replace stuff in <code><angle brackets></code>):
+(replace stuff in &lt;angle brackets&gt;):
 
     <username>       soft    nofile          200000
     <username>       hard    nofile          200000
 
 My box seems not to take this into account at all. Maybe this would have a
-meaning when I would directly ssh into the box as <code><username></code>.
+meaning when I would directly ssh into the box as &lt;username&gt;.
 
 ### Raise limits, part II
 
