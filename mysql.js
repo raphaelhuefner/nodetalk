@@ -26,7 +26,7 @@ var server = http.createServer(function (req, res) {
 
     dbClient.connect(function (err) {
       if (err) {
-        console.log('connect error: (' + err.number + ') ' + err.message);
+        console.log('DB connect error: (' + err.number + ') ' + err.message);
 //        console.log(util.inspect(err));
       }
 
@@ -35,8 +35,8 @@ var server = http.createServer(function (req, res) {
         [0.666, 'Rise and shine!'],
         function (err, results, fields) {
           if (err) {
-            console.log('read error');
-            console.log(util.inspect(err));
+            console.log('DB read error: (' + err.number + ') ' + err.message);
+//            console.log(util.inspect(err));
           }
   
           res.write(util.inspect(results) + '\n');

@@ -32,9 +32,10 @@ SHOW PROCESSLIST;
 sysctl net.inet.tcp.pcbcount
 
 
+cat /proc/sys/fs/file-max
 
 
-interesting sysctl values:
+interesting Mac OSX sysctl values:
 
 Second level name          Type                   Changeable
 KERN_FILE                  struct file            no

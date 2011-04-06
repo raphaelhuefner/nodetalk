@@ -10,6 +10,7 @@
  *
  * Quick hack.  Increases number of allowed file
  * handles.  Must be run as root (probably as a setuid script).
+ * @see http://www.cs.wisc.edu/condor/condorg/linux_scalability.html
  * @see http://www.cs.wisc.edu/condor/condorg/ulimiter.c
  */
 
