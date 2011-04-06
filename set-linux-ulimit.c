@@ -38,7 +38,7 @@ int main()
 	}
 
 	fprintf(stderr, "Limit was %d (max %d), setting to %d\n",
-			rl.rlim_cur, rl.rlim_max, NEW_MAX);
+			(int) rl.rlim_cur, (int) rl.rlim_max, NEW_MAX);
 
 	rl.rlim_cur = rl.rlim_max = NEW_MAX;
 	ret = setrlimit(RLIMIT_NOFILE, &rl);
@@ -59,7 +59,7 @@ int main()
 	if(rl.rlim_cur < NEW_MAX) {
 		fprintf(stderr, "Failed to set new open file limit.\n"
 				"Limit is %d, expected %d\n",
-				rl.rlim_cur, NEW_MAX);
+				(int) rl.rlim_cur, NEW_MAX);
 		return 1;
 	}
 

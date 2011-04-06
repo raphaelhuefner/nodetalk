@@ -1,5 +1,12 @@
 #!/bin/bash
 
+sudo rm set-linux-ulimit
+gcc set-linux-ulimit.c -o set-linux-ulimit
+chmod u+s set-linux-ulimit
+chmod o-rwx set-linux-ulimit
+chmod g-w set-linux-ulimit
+sudo chown root set-linux-ulimit
+
 rm -rf node_modules
 mkdir -p node_modules
 cd node_modules
