@@ -98,9 +98,12 @@ function parse_size(size) {
   };
   var result = /([0-9]+)\s*(k|m|g)?(b?(ytes?)?)/i.exec(size);
   if (null !== result) {
-    var suffix = result[2].toLowerCase();
-    if ('' == suffix) {
+    var suffix = '1';
+    if (! result[2] || ('' == suffix)) {
       suffix = '1';
+    }
+    else {
+      suffix = result[2].toLowerCase();
     }
     return parseFloat(result[1]) * suffixes[suffix];
   }
@@ -177,7 +180,7 @@ function proclist(prefix, procGrepRegExp) {
     if (! _.isEmpty(amem)) {
       enQueueData(prefix + '-amem', amem);
     }
-    setTimeout(function () { proclist(prefix, localPortRegExp)}, 200);
+    setTimeout(function () { proclist(prefix, procGrepRegExp)}, 200);
   });
 }
 
