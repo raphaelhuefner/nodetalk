@@ -1,3 +1,6 @@
 *~
+/node_modules/socket.io
+/node_modules/connect
+/node_modules/express
 /node_modules/mysql
 /set-linux-ulimit
