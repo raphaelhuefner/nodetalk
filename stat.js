@@ -50,7 +50,7 @@ setInterval(sendDataPackage, 50);
 function netstat() {
   var valid = true;
   var output = {};
-  var netstatChildProcess = spawn('netstat', ['--inet', '-an']); // Linux
+  var netstatChildProcess = spawn('netstat', ['--inet', '-anW']); // Linux
 //  var netstatChildProcess = spawn('netstat', ['-f', 'inet', '-an']); // Mac OSX
   netstatChildProcess.stdin.end();
   netstatChildProcess.stderr.on('data', function(data) {
