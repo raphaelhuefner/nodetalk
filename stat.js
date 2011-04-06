@@ -91,7 +91,7 @@ function netstat(prefix, localPortRegExp) {
 
 function parse_size(size) {
   var suffixes = [
-    '': 1
+    '1': 1
     , 'k': 1024
     , 'm': 1048576 // 1024 * 1024
     , 'g': 1073741824 // 1024 * 1024 * 1024
