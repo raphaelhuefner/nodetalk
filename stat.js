@@ -49,6 +49,7 @@ setInterval(sendDataPackage, 50);
 
 function netstat() {
   var valid = true;
+  var wholestring = '';
   var output = {};
   var netstatChildProcess = spawn('netstat', ['--inet', '-anW']); // Linux
 //  var netstatChildProcess = spawn('netstat', ['-f', 'inet', '-an']); // Mac OSX
@@ -60,18 +61,25 @@ function netstat() {
   netstatChildProcess.stdout.setEncoding('utf8');
 
   netstatChildProcess.stdout.on('data', function (data) {
-    var lines = data.split(/\n/);
+    wholestring += data; // deal with partial lines
+  })
+
+  netstatChildProcess.on('exit', function (code) {
+    var lines = wholestring.split(/\n/);
     for (i = 0; i < lines.length; i++) {
       var fields = lines[i].trim().split(/\s+/);
 
       // gawk '$4 == "127.0.0.1:8567" && $6 != "LISTEN" {sum[$6]++}; END {for (i in sum) print i, sum[i]}'
       if (fields[5] && fields[3] && (/127\.0\.0\.1.8567/.test(fields[3]))) {
-        output[fields[5]] = output[fields[5]] ? output[fields[5]]++ : 1;
+        if (output[fields[5]]) {
+          output[fields[5]] += 1;
+        }
+        else {
+          output[fields[5]] = 1;
+        }
       }
     }
-  })
 
-  netstatChildProcess.on('exit', function (code) {
 //    console.log('child process exited with code ' + code);
 //    console.log(util.inspect(output));
     if (! _.isEmpty(output)) {

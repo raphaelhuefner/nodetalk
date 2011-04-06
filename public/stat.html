@@ -131,8 +131,14 @@
         textLoadAvgLabelRect[prefix].attr({"fill": '#ccc', "stroke": '1px solid #666', opacity:0.75});
         textLoadAvg[prefix] && textLoadAvg[prefix].remove();
         textLoadAvg[prefix] = paper.text(120, graphYOffset+20, prefix).attr({font:"12px 'Fontin Sans', Fontin-Sans, sans-serif"});
+
+        if (textLoadAvgLabel[prefix]) {
+          for (l = 0, ll = textLoadAvgLabel[prefix].length; l < ll; l++) {
+            textLoadAvgLabel[prefix][l] && textLoadAvgLabel[prefix][l].remove();
+            delete textLoadAvgLabel[prefix][l];
+          }
+        }
         for (l = 0, ll = leaves.length; l < ll; l++) {
-          textLoadAvgLabel[prefix] && textLoadAvgLabel[prefix][l] && textLoadAvgLabel[prefix][l].remove();
           textLoadAvgLabel[prefix] = textLoadAvgLabel[prefix] || [];
           textLoadAvgLabel[prefix][l] = paper.text(120, graphYOffset + 40 + (20*l), leaves[l]).attr({font:"12px 'Fontin Sans', Fontin-Sans, sans-serif"});
           textLoadAvgLabel[prefix][l].attr("fill", colors[l]);
