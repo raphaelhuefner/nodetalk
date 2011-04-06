@@ -47,7 +47,7 @@ function sendDataPackage() {
 
 setInterval(sendDataPackage, 50);
 
-function netstat() {
+function netstat(prefix, localPortRegExp) {
   var valid = true;
   var wholestring = '';
   var output = {};
@@ -70,7 +70,7 @@ function netstat() {
       var fields = lines[i].trim().split(/\s+/);
 
       // gawk '$4 == "127.0.0.1:8567" && $6 != "LISTEN" {sum[$6]++}; END {for (i in sum) print i, sum[i]}'
-      if (fields[5] && fields[3] && (/127\.0\.0\.1.8567/.test(fields[3]))) {
+      if (fields[5] && fields[3] && (localPortRegExp.test(fields[3]))) {
         if (output[fields[5]]) {
           output[fields[5]] += 1;
         }
@@ -83,16 +83,16 @@ function netstat() {
 //    console.log('child process exited with code ' + code);
 //    console.log(util.inspect(output));
     if (! _.isEmpty(output)) {
-      enQueueData('netstat', output);
+      enQueueData(prefix, output);
     }
-    setTimeout(netstat, 200);
+    setTimeout(function () { netstat(prefix, localPortRegExp)}, 200);
   });
 }
 
 
 function systemLoad() {
   var avg = os.loadavg();
-  enQueueData('systemLoad', {
+  enQueueData('loadAvg', {
     '1min' : avg[0]
     , '5min' : avg[1]
     , '15min' : avg[2]
@@ -128,8 +128,8 @@ function mySqlProcessCount() {
         console.log('DB read error: (' + err.number + ') ' + err.message);
       }
       else {
-        enQueueData('mySqlProcessCount', {
-          'processes' : results.length
+        enQueueData('MySQL', {
+          'ProcessCount' : results.length
         });
         setTimeout(mySqlProcessCount, 100);
       }
@@ -139,8 +139,9 @@ function mySqlProcessCount() {
 }
 
 
+netstat('node-netstat', /127\.0\.0\.1.8567/);
+netstat('apache-netstat', /127\.0\.0\.1.8004/);
 
 
-netstat();
 systemLoad();
 mySqlProcessCount();
