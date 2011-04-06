@@ -117,7 +117,7 @@
         x.push([0]); // fixate y axis
         y.push([1]); // fixate y axis
         linechartLoadAvg[graphIndex] && linechartLoadAvg[graphIndex].remove();
-        linechartLoadAvg[graphIndex] = paper.g.linechart(30, graphYOffset+10, 720, 150, x, y, {shade: true, axis: "0 1 1 1", colors: colors});
+        linechartLoadAvg[graphIndex] = paper.g.linechart(30, graphYOffset+10, 720, 150, x, y, {shade: true, axis: "0 1 1 1", symbol: "o", width:1, colors: colors});
         textLoadAvgLabelRect[graphIndex] && textLoadAvgLabelRect[graphIndex].remove();
         textLoadAvgLabelRect[graphIndex] = paper.rect(60, graphYOffset+2, 120, (20*(leaves.length+2)), 10);
         textLoadAvgLabelRect[graphIndex].attr({"fill": '#ccc', "stroke": '1px solid #666', opacity:0.75});
