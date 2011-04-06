@@ -89,6 +89,94 @@ function netstat(prefix, localPortRegExp) {
   });
 }
 
+function parse_size(size) {
+  var suffixes = [
+    '': 1
+    , 'k': 1024
+    , 'm': 1048576 // 1024 * 1024
+    , 'g': 1073741824 // 1024 * 1024 * 1024
+  ];
+  var result = /([0-9]+)\s*(k|m|g)?(b?(ytes?)?)/i.exec(size);
+  if (null !== result) {
+    return parseFloat(result[1]) * suffixes[result[2].toLowerCase()];
+  }
+}
+
+function proclist(prefix, procGrepRegExp) {
+  var wholestring = '';
+  var num = {};
+  var cpu = {};
+  var pmem = {};
+  var amem = {};
+  var psChildProcess = spawn('ps', ['-A', '-opcpu,pmem,rss,comm']); // Linux
+  psChildProcess.stdin.end();
+  psChildProcess.stderr.on('data', function(data) {
+//    console.log('stderr: ' + data);
+  });
+  psChildProcess.stdout.setEncoding('utf8');
+
+  psChildProcess.stdout.on('data', function (data) {
+    wholestring += data; // deal with partial lines by buffering the whole output
+  })
+
+  psChildProcess.on('exit', function (code) {
+    var lines = wholestring.split(/\n/);
+    for (i = 0; i < lines.length; i++) {
+      var line = lines[i];
+      var grepResult = procGrepRegExp.exec(line);
+      var fields = line.trim().split(/\s+/);
+      if ((null !== grepResult) && fields[1] && fields[2] && fields[3]) {
+        procName = grepResult[0];
+
+        if (num[procName]) {
+          num[procName] += 1;
+        }
+        else {
+          num[procName] = 1;
+        }
+
+        if (cpu[procName]) {
+          cpu[procName] += parseFloat(fields[0]);
+        }
+        else {
+          cpu[procName] = parseFloat(fields[0]);
+        }
+
+        if (pmem[procName]) {
+          pmem[procName] += parseFloat(fields[1]);
+        }
+        else {
+          pmem[procName] = parseFloat(fields[1]);
+        }
+
+        if (amem[procName]) {
+          amem[procName] += parse_size(fields[2]);
+        }
+        else {
+          amem[procName] = parse_size(fields[2]);
+        }
+
+      }
+    }
+
+//    console.log('child process exited with code ' + code);
+//    console.log(util.inspect(output));
+    if (! _.isEmpty(num)) {
+      enQueueData(prefix + '-num', num);
+    }
+    if (! _.isEmpty(cpu)) {
+      enQueueData(prefix + '-cpu', cpu);
+    }
+    if (! _.isEmpty(pmem)) {
+      enQueueData(prefix + '-pmem', pmem);
+    }
+    if (! _.isEmpty(amem)) {
+      enQueueData(prefix + '-amem', amem);
+    }
+    setTimeout(function () { proclist(prefix, localPortRegExp)}, 200);
+  });
+}
+
 
 function systemLoad() {
   var avg = os.loadavg();
@@ -115,7 +203,7 @@ process.on('exit', function () {
 dbClient.connect(function dbConnectHandler (err) {
   if (err) {
     console.log('DB connect error: (' + err.number + ') ' + err.message);
-    process.exit(1);
+//    process.exit(1);
   }
 });
 
@@ -141,7 +229,7 @@ function mySqlProcessCount() {
 
 netstat('node-netstat', /127\.0\.0\.1.8567/);
 netstat('apache-netstat', /127\.0\.0\.1.8004/);
-
+proclist('proc', /apache2|node|mysqlphp-cgi|nginx/);
 
 systemLoad();
 mySqlProcessCount();
