@@ -61,7 +61,7 @@ function netstat(prefix, localPortRegExp) {
   netstatChildProcess.stdout.setEncoding('utf8');
 
   netstatChildProcess.stdout.on('data', function (data) {
-    wholestring += data; // deal with partial lines
+    wholestring += data; // deal with partial lines by buffering the whole output
   })
 
   netstatChildProcess.on('exit', function (code) {

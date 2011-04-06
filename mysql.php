@@ -4,7 +4,8 @@ header('content-type: text/plain', TRUE, 200);
 echo "hello\n";
 
 try {
-  $db = new PDO('mysql:host=127.0.0.1;port=8889', 'dev', 'dev');
+//  $db = new PDO('mysql:host=127.0.0.1;port=8889', 'dev', 'dev'); // 8889 is for MAMP
+  $db = new PDO('mysql:host=127.0.0.1;port=3306', 'dev', 'dev');
 } catch (Exception $err) {
   echo 'connect problem';
   throw $err;

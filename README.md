@@ -1,6 +1,9 @@
 # Try to get node running with a concurrency of at least 1000 connections
 
+
+
 ## Linux (Ubuntu 9.10 "karmic koala")
+
 
 ### Raise limits, part I
 
@@ -17,6 +20,7 @@ Add or modify the following lines
 My box seems not to take this into account at all. Maybe this would have a
 meaning when I would directly ssh into the box as &lt;username&gt;.
 
+
 ### Raise limits, part II
 
 Edit file /etc/rc.local
@@ -30,6 +34,7 @@ Add or modify the following lines:
 
 Maybe this helps Apache and MySQL?
 
+
 ### Raise limits, part III
 
 Since I ssh into my Linux box as root (boo!), do this as well:
@@ -42,6 +47,7 @@ Add or modify the following lines:
     ulimit -Hn 1000000
     ulimit -Sn 1000000
 
+
 ### Raise MySQL connection limit
 
     vim /etc/mysql/my.cnf
@@ -53,6 +59,19 @@ Add or modify the following lines:
 Restart MySQL
 
     /etc/init.d/mysql restart
+
+
+### Configure Apache2
+
+    <IfModule mpm_prefork_module>
+        StartServers       8
+        MinSpareServers    5
+        MaxSpareServers   15
+        MaxClients       256
+        MaxRequestsPerChild   0
+    </IfModule>
+
+
 
 ## MacOS X
 
