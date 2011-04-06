@@ -1,0 +1,69 @@
+
+
+
+ps aux | gawk 'match($0, /firefox|httpd|mysql/, matches) {sum[matches[0]] += $3}; END {print "["; for (i in sum) { print comma "{\"" i "\": " sum[i] "}"; comma = ","} print "]"}'
+
+http://dev.mysql.com/doc/refman/5.1/en/miscellaneous-functions.html#function_sleep
+
+SELECT SLEEP(0.666) AS nightcap, 'Rise and shine! Good morning world!' AS greeting;
+
+SELECT SLEEP(0.666) AS LEEP, 'Rise and shine!' AS greeting;
+
+
+
+# set max number of file descriptors, soft limit
+ulimit -S -n 2048
+
+# get max number of file descriptors, soft limit
+ulimit -S -n
+
+# get max number of file descriptors, hard limit
+ulimit -H -n
+
+
+
+SHOW VARIABLES WHERE Variable_name = 'open_files_limit';
+
+SHOW STATUS WHERE Variable_name = 'Threads_running';
+
+SHOW PROCESSLIST;
+
+# show number of open sockets on system:
+sysctl net.inet.tcp.pcbcount
+
+
+
+
+interesting sysctl values:
+
+Second level name          Type                   Changeable
+KERN_FILE                  struct file            no
+KERN_MAXFILES              integer                yes
+KERN_MAXFILESPERPROC       integer                yes
+KERN_MAXPROC               integer                no
+KERN_MAXPROCPERUID         integer                yes
+KERN_QUANTUM               integer                yes
+
+KERN_FILE
+       Return the entire file table.  The returned data consists of a single struct filehead followed by an array of struct file, whose size
+       depends on the current number of such objects in the system.
+
+KERN_MAXFILES
+       The maximum number of files that may be open in the system.
+
+KERN_MAXFILESPERPROC
+       The maximum number of files that may be open for a single process.  This limit only applies to processes with an effective uid of nonzero at
+       the time of the open request.  Files that have already been opened are not affected if the limit or the effective uid is changed.
+
+KERN_MAXPROC
+       The maximum number of concurrent processes the system will allow.
+
+KERN_MAXPROCPERUID
+       The maximum number of concurrent processes the system will allow for a single effective uid.  This limit only applies to processes with an
+       effective uid of nonzero at the time of a fork request.  Processes that have already been started are not affected if the limit is changed.
+
+KERN_QUANTUM
+       The maximum period of time, in microseconds, for which a process is allowed to run without being preempted if other processes are in the run
+       queue.
+
+
