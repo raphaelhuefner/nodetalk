@@ -145,7 +145,7 @@
         }
       }
 
-      window.setInterval(function () {
+      function refreshAll() {
         var currentHierarchy = {};
         for (prefix in hierarchy) {
           currentHierarchy[prefix] = currentHierarchy[prefix] || {};
@@ -166,7 +166,9 @@
           redraw(prefix, _.toArray(currentHierarchy[prefix]), graphIndex);
           graphIndex++;
         }
-      }, 500);
+        window.setTimeout(refreshAll, 500);
+      };
+
 
 
     </script>
