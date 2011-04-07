@@ -1,79 +1,10 @@
-# Try to get node running with a concurrency of at least 1000 connections
+# Try to setup a high concurrency scenario on my MacBook Pro / OS X
 
+These notes reflect my findings how to adapt the environment to enable a single server process to serve many concurrent connections / clients.
 
+My experience is that I could not get it to work reliably and reproducably. For some reason unknown to me there are many more connection errors happening than there are on Ubuntu. 
 
-## Linux (Ubuntu 9.10 "karmic koala")
-
-
-### Raise limits, part I
-
-Edit file /etc/security/limits.conf
-
-    sudo vim /etc/security/limits.conf
-
-Add or modify the following lines
-(replace stuff in &lt;angle brackets&gt;):
-
-    <username>       soft    nofile          200000
-    <username>       hard    nofile          200000
-
-My box seems not to take this into account at all. Maybe this would have a
-meaning when I would directly ssh into the box as &lt;username&gt;.
-
-
-### Raise limits, part II
-
-Edit file /etc/rc.local
-
-    sudo vim /etc/rc.local
-
-Add or modify the following lines:
-
-    ulimit -Hn 1000000
-    ulimit -Sn 1000000
-
-Maybe this helps Apache and MySQL?
-
-
-### Raise limits, part III
-
-Since I ssh into my Linux box as root (boo!), do this as well:
-Edit file /root/.bashrc
-
-    sudo vim /root/.bashrc
-
-Add or modify the following lines:
-
-    ulimit -Hn 1000000
-    ulimit -Sn 1000000
-
-
-### Raise MySQL connection limit
-
-    vim /etc/mysql/my.cnf
-
-Add or modify the following lines:
-
-    max_connections = 5001
-
-Restart MySQL
-
-    /etc/init.d/mysql restart
-
-
-### Configure Apache2
-
-    <IfModule mpm_prefork_module>
-        StartServers       8
-        MinSpareServers    5
-        MaxSpareServers   15
-        MaxClients       256
-        MaxRequestsPerChild   0
-    </IfModule>
-
-
-
-## MacOS X
+That's why I abandoned setting up such a scenario on Mac OS X, but still these notes could be helpful as a starting point for another person with more luck than me.
 
 ### Raise system limits
 
@@ -131,3 +62,4 @@ add or modify the following settings to read as this:
     bind_address=127.0.0.1
 
 Restart MySQL to take these new settings into account.
+

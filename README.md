@@ -1,133 +1,15 @@
-# Try to get node running with a concurrency of at least 1000 connections
+# Try to get node.js running with a concurrency of at least 1000 connections
+
+Hi, my name is Raphael Huefner and I am a [Drupal](http://drupal.org) Developer by trade. I "recently heard" of "a new thing" called [node.js](http://nodejs.org/) which is being appraised as a web server capable of serving so many more clients at the same time (concurrently) with just a single process than good old trusty [Apache](http://httpd.apache.org) could do with a bunch of pre-forked child processes.
+
+I wanted to bring across some of the points made by node.js by giving a talk in front of my colleagues. 
+
+This GitHub repository contains some notes and source code supporting this talk: 
+
+* [notes on setting up a high concurrency environment on Mac OSX](doc/setup-macosx.md) on which I wasn't *that* successful
+* [notes on setting up a high concurrency environment on Ubuntu](doc/setup-ubuntu.md) which are still kinda un-structured
 
 
 
-## Linux (Ubuntu 9.10 "karmic koala")
 
 
-### Raise limits, part I
-
-Edit file /etc/security/limits.conf
-
-    sudo vim /etc/security/limits.conf
-
-Add or modify the following lines
-(replace stuff in &lt;angle brackets&gt;):
-
-    <username>       soft    nofile          200000
-    <username>       hard    nofile          200000
-
-My box seems not to take this into account at all. Maybe this would have a
-meaning when I would directly ssh into the box as &lt;username&gt;.
-
-
-### Raise limits, part II
-
-Edit file /etc/rc.local
-
-    sudo vim /etc/rc.local
-
-Add or modify the following lines:
-
-    ulimit -Hn 1000000
-    ulimit -Sn 1000000
-
-Maybe this helps Apache and MySQL?
-
-
-### Raise limits, part III
-
-Since I ssh into my Linux box as root (boo!), do this as well:
-Edit file /root/.bashrc
-
-    sudo vim /root/.bashrc
-
-Add or modify the following lines:
-
-    ulimit -Hn 1000000
-    ulimit -Sn 1000000
-
-
-### Raise MySQL connection limit
-
-    vim /etc/mysql/my.cnf
-
-Add or modify the following lines:
-
-    max_connections = 5001
-
-Restart MySQL
-
-    /etc/init.d/mysql restart
-
-
-### Configure Apache2
-
-    <IfModule mpm_prefork_module>
-        StartServers       8
-        MinSpareServers    5
-        MaxSpareServers   15
-        MaxClients       256
-        MaxRequestsPerChild   0
-    </IfModule>
-
-
-
-## MacOS X
-
-### Raise system limits
-
-To raise some system limitations, issue these commands:
-
-    sudo sysctl -w kern.maxvnodes=4000000
-    sudo sysctl -w kern.maxfiles=1000000
-    sudo sysctl -w kern.maxfilesperproc=100000
-    sudo sysctl -w kern.maxnbuf=100000
-    sudo sysctl -w net.inet.ip.portrange.first=10000
-    sudo sysctl -w net.inet.ip.portrange.hifirst=10000
-
-You might need to restart all dependent processes (servers, clients, shells) 
-for them to come under the effect of the raised limits.
-
-Alternatively, you could edit the "System Control" configuration file:
-
-    sudo vim /etc/sysctl.conf
-    
-add or modify the following settings to read as this:
-
-    kern.maxvnodes=4000000
-    kern.maxfiles=1000000
-    kern.maxfilesperproc=100000
-    kern.maxnbuf=100000
-    net.inet.ip.portrange.first=10000
-    net.inet.ip.portrange.hifirst=10000
-
-You might need to restart your computer for these settings to come into effect.
-
-### Raise the limits for MAMP (Apache and MySQL)
-
-Edit the MAMP start files to take the raised system limits into account:
-
-    vim /Applications/MAMP/bin/start{Apache,Mysql}.sh
-
-After the [MAMP, what are you doing there?] hashbang, add the following line:
-
-    ulimit -S -n $(sysctl -n kern.maxfilesperproc)
-
-### Setup MySQL
-
-Edit MySQL configuration file:
-
-    vim /Applications/MAMP/conf/my.cnf
-
-Under the section
-
-    [mysqld]
-
-add or modify the following settings to read as this:
-
-    port=3306
-    max_connections=1001
-    bind_address=127.0.0.1
-
-Restart MySQL to take these new settings into account.
