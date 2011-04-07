@@ -6,8 +6,10 @@ I wanted to bring across some of the points made by node.js by giving a talk in 
 
 This GitHub repository contains some notes and source code supporting this talk: 
 
-* [notes on setting up a high concurrency environment on Mac OSX](./doc/setup-macosx.md) on which I wasn't *that* successful
-* [notes on setting up a high concurrency environment on Ubuntu](./doc/setup-ubuntu.md) which are still kinda un-structured
+* [notes on setting up a high concurrency environment on Mac OSX](https://github.com/raphaelhuefner/nodetalk/blob/master/doc/setup-macosx.md) 
+  on which I wasn't *that* successful
+* [notes on setting up a high concurrency environment on Ubuntu](https://github.com/raphaelhuefner/nodetalk/blob/master/doc/setup-ubuntu.md) 
+  which are still kinda un-structured
 
 
 
