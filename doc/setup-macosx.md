@@ -1,6 +1,6 @@
 # Try to setup a high concurrency scenario on my MacBook Pro / OS X
 
-These notes reflect my findings how to adapt the environment to enable a single server process to serve many concurrent connections / clients.
+These notes reflect my findings on how to adapt the environment to enable a single server process to serve many concurrent connections / clients.
 
 My experience is that I could not get it to work reliably and reproducably. For some reason unknown to me there are many more connection errors happening than there are on Ubuntu. 
 
